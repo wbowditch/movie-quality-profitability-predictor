@@ -74,14 +74,15 @@ def get_data(title):
 		if movie['year'] >= 2013 and movie['kind']=='movie':
 			search=False
 
-	#could not find movie
+	#could not find film
 	if search:
 		print "Cannot find film {}".format(title)
 		return None
 
-	#once we find it, update our info
+	#if we find it, pull more info
 	ia.update(movie)
 	ia.update(movie, 'business')
+	ia.update(movie, 'release dates')
 	biz = movie['business']
 
 	#get budget
@@ -105,11 +106,8 @@ def get_data(title):
 		gross = gross.replace(',', '')
 		gross = int(re.findall('\d+', gross)[0])
 
+	# print some datas
 	print "Title: {} Gross: {}".format(movie['title'],gross)
-
-#	if type(gross) != int:
-#		print "Could not find Worldwide gross for film {}".format(movie['title'])
-#		gross = None
 
 	#get opening weekend data
 	if not 'weekend gross' in biz:
@@ -129,7 +127,6 @@ def get_data(title):
 			if scr > mx_scr:
 				mx_scr = scr
 
-	ia.update(movie, 'release dates')
 	dates = movie['release dates']
 	for date in dates:
 		if 'USA' in date and '(' not in date:
@@ -157,12 +154,12 @@ def get_data(title):
 	return data
 
 def main():
-	data_dct={}
+	data_lst=[]
 
 	movie_lst = MOVIE_LST
 	for movie in movie_lst:
-		data_dct[movie] = get_data(movie)
-	#print data_dct
+		data_lst.append(get_data(movie))
+	#print data_lst
 
 if __name__ == "__main__":
 	main()
