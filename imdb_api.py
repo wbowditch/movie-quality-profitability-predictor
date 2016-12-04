@@ -61,7 +61,7 @@ MOVIE_LST = [
 'Ben-Hur',
 '47 Ronin',
 'R.I.P.D.',
-	]
+]
 
 def get_data(title):
 	mlst = ia.search_movie(title)
