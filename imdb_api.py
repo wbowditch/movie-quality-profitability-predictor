@@ -117,19 +117,30 @@ def get_data(title):
 		op_wkd = None
 		screens = None
 		op_per_scr = None
+		mx_scr = None
 	else:
 		op_wkd = biz['weekend gross'][-1]
 		op_wkd = op_wkd.replace(',', '')
 		op_wkd, foo, foo1, screens = [int(i) for i in re.findall('\d+', op_wkd)]
 		op_per_scr = op_wkd / screens
+		mx_scr = 0
+		for item in biz['weekend gross']:
+			scr = int(re.findall('\d+',item)[-1])
+			if scr > mx_scr:
+				mx_scr = scr
 
 	ia.update(movie, 'release dates')
 	dates = movie['release dates']
 	for date in dates:
-		if 'USA' in date and 'premiere' not in date:
+		if 'USA' in date and '(' not in date:
 			date = date.split('::')
 			date = datetime.strptime(date[1], '%d %B %Y')
 
+	if 'production company' in movie.data.keys():
+		print "No production company info for film {}".format(movie['title'])
+		prd = None
+	else:
+		prd = movie.get('production companies')[0]['name']
 
 	data = {}
 	data['title'] = title
@@ -141,12 +152,13 @@ def get_data(title):
 	data['genres'] = movie.get('genres')
 	data['rating'] = movie.get('rating')
 	data['date'] = date
-	data['production company'] = movie.get('prodcution companies')[0]['name']
+	data['production company'] = prd
+	data['max number theaters'] = mx_scr
 	return data
 
 def main():
 	data_dct={}
-	#movie_lst = ['Star Wars: The Force Awakens', 'Jurassic World', 'Inside Out', 'Furious 7']
+
 	movie_lst = MOVIE_LST
 	for movie in movie_lst:
 		data_dct[movie] = get_data(movie)
