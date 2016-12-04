@@ -12,10 +12,10 @@ YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
 def update_movie_data():
-    data_table = pd.read_csv("ml_set.csv",index_col=0)
+    data_table = pd.read_csv("data_set.csv",index_col=0)
     film_titles = data_table.index  # list of all of our movie titles in the dataset.
 
-    
+
 
     youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION,
     developerKey=DEVELOPER_KEY)
@@ -39,15 +39,15 @@ def update_movie_data():
                          video_result["statistics"]["viewCount"],
                          video_result["statistics"]["likeCount"],
                          video_result["statistics"]["dislikeCount"])
-        
+
         data_table.set_value(title,'YouTube Trailer Views',video_result["statistics"]["viewCount"])
         data_table.set_value(title,'YouTube Like',video_result["statistics"]["likeCount"])
         data_table.set_value(title,'YouTube Dislike',video_result["statistics"]["dislikeCount"])
-        
-    data_table.to_csv("csv_output", encoding='utf-8')
-        
 
-    
+    data_table.to_csv("csv_output", encoding='utf-8')
+
+
+
 
 
 if __name__ == "__main__":
