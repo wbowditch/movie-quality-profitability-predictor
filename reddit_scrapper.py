@@ -21,8 +21,13 @@ def aggregate_analysis(movie_name):
     #print help(r.search)
     obj = r.search(movie_name + " Trailer flair:'Trailer' ",subreddit="movies")
     #print obj
-    submission = obj.next()
+    try:
+        submission = obj.next()
+        print submission.title
+    except StopIteration:
+        return
     ratio = r.get_submission(submission.permalink).upvote_ratio
+
     #print dict(submission)
     #print help(submission)
 
@@ -57,15 +62,15 @@ def aggregate_analysis(movie_name):
 
 #file = open("sentiment_ups_comments_ratio.txt", "w")
 #file2 = open("2015movies.txt","r")
-index = 0
+#index = 0
 #print film_titles
 for title in film_titles:
         print title
         #title = str(row["Opening"])
         #print type(title), title
         aggregate_analysis(title.strip())
-        print index
-        index+=1
+        #print index
+        #index+=1
 
         #print sentiment
         #output.loc[title] = sentiment

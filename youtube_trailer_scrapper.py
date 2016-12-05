@@ -7,7 +7,7 @@ from apiclient.errors import HttpError
 from oauth2client.tools import argparser
 import pandas as pd
 
-DEVELOPER_KEY = "INSERT_KEY_HERE"
+DEVELOPER_KEY = "AIzaSyAVDOGjH2fHe6GCpP_jNb18-fsRWsedLXE"
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 

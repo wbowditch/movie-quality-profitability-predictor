@@ -80,9 +80,11 @@ def get_data(title):
 		return None
 
 	#if we find it, pull more info
+
 	ia.update(movie)
 	ia.update(movie, 'business')
 	ia.update(movie, 'release dates')
+	print sorted(movie.keys())
 	biz = movie['business']
 
 	#get budget
