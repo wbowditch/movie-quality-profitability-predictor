@@ -7,6 +7,7 @@ from datetime import datetime
 import re
 import pandas as pd
 from imdb import IMDb
+import random
 
 ia = IMDb()
 
@@ -63,14 +64,17 @@ MOVIE_LST = [
 'R.I.P.D.',
 ]
 
-def get_data(title):
+def get_data(title,data_table):
 	mlst = ia.search_movie(title)
 
 	#search for the film
 	mlst.reverse()
 	search = True
-	while(search and mlst ):
+	while(search):
+		if len(mlst) == 0:
+			break
 		movie = mlst.pop()
+		print movie
 		if movie['year'] >= 2013 and movie['kind']=='movie':
 			search=False
 
@@ -84,7 +88,11 @@ def get_data(title):
 	ia.update(movie)
 	ia.update(movie, 'business')
 	ia.update(movie, 'release dates')
+<<<<<<< HEAD
 	print sorted(movie.keys())
+=======
+	#print sorted(movie.keys())
+>>>>>>> origin/master
 	biz = movie['business']
 
 	#get budget
@@ -130,17 +138,31 @@ def get_data(title):
 				mx_scr = scr
 
 	dates = movie['release dates']
+	#print dates
 	for date in dates:
 		if 'USA' in date and '(' not in date:
+			#print date
 			date = date.split('::')
 			date = datetime.strptime(date[1], '%d %B %Y')
+			break
 
-	if 'production company' in movie.data.keys():
+	if not 'production companies' in movie.data.keys():
 		print "No production company info for film {}".format(movie['title'])
 		prd = None
 	else:
 		prd = movie.get('production companies')[0]['name']
 
+	if 'mpaa' not in movie.keys():
+		print "Could not find mpaa info for film {}".format(movie['title'])
+		mpaa = None
+	else:
+		mpaa = movie.get('mpaa').split(' ')[1]
+
+	rt = int(re.findall('\d+', movie.get('runtime')[0])[0])
+	genres = ', '.join(movie.get('genres'))
+
+	print mpaa
+	print rt
 	data = {}
 	data['title'] = title
 	data['domestic gross'] = gross
@@ -148,20 +170,46 @@ def get_data(title):
 	data['opening weekend'] = op_wkd
 	data['theaters'] = screens
 	data['opening/theater'] = op_per_scr
-	data['genres'] = movie.get('genres')
+	data['genres'] = genres
 	data['rating'] = movie.get('rating')
 	data['date'] = date
 	data['production company'] = prd
 	data['max number theaters'] = mx_scr
-	return data
+	data['mpaa'] = mpaa
+	data['runtime'] = rt
+
+	data_table.Genre = data_table.Genre.astype('str')
+	data_table.MPAA = data_table.MPAA.astype('str')
+	data_table.set_value(title, 'MPAA', mpaa)
+	data_table.set_value(title, 'Runtime', rt)
+	data_table.set_value(title,'Genre',genres)
+	data_table.set_value(title,'IMDB Rating',data['rating'])
+	#date = date.split(' ')[-2]
+	#print date
+	#data_table.Date = data_table.Date.astype('str')
+	data_table.set_value(title,'Date',date)
+	data_table.Distributor = data_table.Distributor.astype('str')
+	data_table.set_value(title,'Distributor',prd)
+	data_table.set_value(title,'Domestic Gross',gross)
+	data_table.set_value(title,'Budget',bud)
+	data_table.set_value(title,'Opening Gross',op_wkd)
+	data_table.set_value(title,'Theaters',screens)
+	data_table.set_value(title,'Opening/Theatre',op_per_scr)
+	data_table.set_value(title,'Max Number Theaters',mx_scr)
+	return data_table
+
 
 def main():
 	data_lst=[]
-
-	movie_lst = MOVIE_LST
+	data_table = pd.read_csv("data_output.csv",index_col=0)
+	movie_lst = data_table.index
+	#movie_lst = MOVIE_LST
 	for movie in movie_lst:
-		data_lst.append(get_data(movie))
+		data_table = get_data(movie,data_table)
+		#data_lst.append(get_data(movie))
 	#print data_lst
+
+	data_table.to_csv("data_output.csv",encoding = 'utf-8')
 
 if __name__ == "__main__":
 	main()
