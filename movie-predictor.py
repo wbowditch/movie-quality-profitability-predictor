@@ -54,7 +54,7 @@ class Movie:
 
 
 
-data_table = pd.read_csv("data_set.csv",index_col=0)
+data_table = pd.read_csv("total_set.csv",index_col=0)
 film_titles = data_table.index  # list of all of our movie titles in the dataset.
 #print film_titles
 data = data_table[['Sequel',
@@ -80,8 +80,10 @@ data_norm = (data - data.mean()) / (data.max() - data.min())
 profitability_target = data_table['Profitable']
 gross_target = data_table['Domestic Gross']
 tomato = data_table['Rotten']
+
+
 normalized_target_gross = (gross_target - gross_target.mean()) / (gross_target.max() - gross_target.min())
-tomato = (tomato - tomato.mean()) / (tomato.max() - tomato.min())
+#tomato = (tomato - tomato.mean()) / (tomato.max() - tomato.min())
 
 
 clf_profit = svm.SVC(kernel='linear',C=1000,verbose=True)
@@ -93,6 +95,8 @@ clf_rating.fit(data_norm,normalized_target_gross)
 clf_tomato = svm.SVR()
 clf_tomato.fit(data_norm,tomato)
 
+
+print clf_profit.coef_
 
 print "done"
 
@@ -160,10 +164,3 @@ for film,profit,rating,true_rating,true_profit,tomato,actual_t in zip(film_title
     print "Predicted Rating",rating, "Actual Rating", true_rating
     print "Predicted Profit",profit, "Actual Profit", true_profit
     print "Predicted Tomato",tomato, "Actual Tomato",actual_t
-
-
-
-
-
-
-
