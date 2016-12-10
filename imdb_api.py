@@ -84,15 +84,10 @@ def get_data(title,data_table):
 		return None
 
 	#if we find it, pull more info
-
 	ia.update(movie)
 	ia.update(movie, 'business')
 	ia.update(movie, 'release dates')
-<<<<<<< HEAD
-	print sorted(movie.keys())
-=======
 	#print sorted(movie.keys())
->>>>>>> origin/master
 	biz = movie['business']
 
 	#get budget
@@ -106,15 +101,19 @@ def get_data(title,data_table):
 
 	#get domestic gross
 	if not 'gross' in biz:
-		print "Could not find Budget for film {}".format(movie['title'])
+		print "Could not find Gross for film {}".format(movie['title'])
 		gross = None
 
 	else:
 		gross = [i for i in biz['gross'] if '(USA)' in i]
-		gross.reverse()
-		gross = gross.pop()
-		gross = gross.replace(',', '')
-		gross = int(re.findall('\d+', gross)[0])
+		if len(gross) == 0:
+			gross = None
+		else:
+			gross.reverse()
+			gross = gross.pop()
+			gross = gross.replace(',', '')
+			gross = int(re.findall('\d+', gross)[0])
+
 
 	# print some datas
 	print "Title: {} Gross: {}".format(movie['title'],gross)
@@ -126,37 +125,53 @@ def get_data(title,data_table):
 		screens = None
 		op_per_scr = None
 		mx_scr = None
+	#Suicide Squad, Moonlight
 	else:
 		op_wkd = biz['weekend gross'][-1]
 		op_wkd = op_wkd.replace(',', '')
 		op_wkd, foo, foo1, screens = [int(i) for i in re.findall('\d+', op_wkd)]
 		op_per_scr = op_wkd / screens
 		mx_scr = 0
-		for item in biz['weekend gross']:
-			scr = int(re.findall('\d+',item)[-1])
-			if scr > mx_scr:
-				mx_scr = scr
+		wkd_lst = [i for i in biz['weekend gross'] if 'USA' in i]
+		#print wkd_lst
+		for item in wkd_lst:
+			item = item.replace(',', '')
+			scr = re.findall('\d+ Screens',item)
+			if scr == []:
+				pass
+			else:
+				scr = int(scr[0].split(' ')[0])
+				if scr > mx_scr:
+					mx_scr = scr
 
+	print mx_scr
 	dates = movie['release dates']
 	#print dates
-	for date in dates:
-		if 'USA' in date and '(' not in date:
+	date = None
+	for d in dates:
+		if 'USA' in d and '(' not in d:
 			#print date
-			date = date.split('::')
+			date = d.split('::')
 			date = datetime.strptime(date[1], '%d %B %Y')
 			break
 
+	print date
 	if not 'production companies' in movie.data.keys():
 		print "No production company info for film {}".format(movie['title'])
 		prd = None
 	else:
 		prd = movie.get('production companies')[0]['name']
 
+	mpaa_lst = ['G', 'PG', 'PG-13', 'R']
 	if 'mpaa' not in movie.keys():
 		print "Could not find mpaa info for film {}".format(movie['title'])
 		mpaa = None
 	else:
-		mpaa = movie.get('mpaa').split(' ')[1]
+		mpaa = movie.get('mpaa').split(' ')
+		for i in mpaa:
+			if i in mpaa_lst:
+				mpaa = i
+				break
 
 	rt = int(re.findall('\d+', movie.get('runtime')[0])[0])
 	genres = ', '.join(movie.get('genres'))
